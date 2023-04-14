@@ -19,22 +19,22 @@ impl ThreadPool {
   ///
   /// The `new` function will panic if the size is zero.
   pub fn new(size: usize) -> ThreadPool {
-    assert!(size > 0);
+      assert!(size > 0);
 
-    let (sender, receiver) = mpsc::channel();
+      let (sender, receiver) = mpsc::channel();
 
-    let receiver = Arc::new(Mutex::new(receiver));
+      let receiver = Arc::new(Mutex::new(receiver));
 
-    let mut workers = Vec::with_capacity(size);
+      let mut workers = Vec::with_capacity(size);
 
-    for id in 0..size {
-        workers.push(Worker::new(id, Arc::clone(&receiver)));
-    }
+      for id in 0..size {
+          workers.push(Worker::new(id, Arc::clone(&receiver)));
+      }
 
-    ThreadPool {
-      workers,
-      sender: Some(sender),
-    }
+      ThreadPool {
+          workers,
+          sender: Some(sender),
+      }
   }
 
   pub fn execute<F>(&self, f: F)
@@ -55,7 +55,6 @@ impl Drop for ThreadPool {
           println!("Shutting down worker {}", worker.id);
 
           if let Some(thread) = worker.thread.take() {
-              // Calls join to wait for each worker thread to finish.
               thread.join().unwrap();
           }
       }
